@@ -1,7 +1,6 @@
 import string
 import random
 
-
 class Markov:
     
     def __init__(self):
@@ -9,11 +8,15 @@ class Markov:
         self.prefix = ()
 
     def process_word(self, word, order =2):
-        """Function to add relevant suffix to suffix_map depending on which prefix the word follows
-        order: number of words per prefix"""
-        if len(self.prefix) < order:
+        """
+        Function to add relevant suffix to suffix_map depending on which prefix the word follows
+        order: number of words per prefix
+        """
+        #add words to prefix to get the 'order' as defined in function parameters
+        if len(self.prefix) < order: 
             self.prefix += (word,)
             return
+        #map prefixes to suffixes
         try:
             self.suffix_map[self.prefix].append(word)
         except KeyError:
@@ -23,7 +26,9 @@ class Markov:
         self.prefix = self.shift(self.prefix, word)
 
     def process_file(self, filename, order = 2):
-        """performs process_word for each word in file"""
+        """
+        performs 'process_word' for each word in file
+        """
         fp = open(filename)
         self.skip_gutenberg_header(fp)
 
@@ -32,6 +37,9 @@ class Markov:
                 self.process_word(word, order)
 
     def skip_gutenberg_header(self, fp):
+        """
+        skips the small print for gutenberg project text
+        """
         for line in fp:
             if line.startswith("*END*THE SMALL PRINT!"):
                 break
@@ -41,10 +49,14 @@ class Markov:
         return t[1:] + (word,)
 
     def random_text(self, n=100):
-        """creates random text based on the prefix and suffix maps
-        n: length of text"""
+        """
+        creates random text based on the prefix and suffix maps
+        n: length of text
+        """
+        #select random prefix
         start = random.choice(list(self.suffix_map.keys()))
         
+        #choose following word from suffix map, shift prefix window along by 1. Repeat
         for i in range(n):
             suffixes = self.suffix_map.get(start, None)
             if suffixes == None:
